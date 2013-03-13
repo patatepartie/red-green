@@ -9,92 +9,48 @@
 
 		<script>
 			window.onload = function() {
-				var gpsCoordinates = window.sodegaura_01_coords;
+				var outside = window.sodegaura_01_coords;
+				var inside = window.sodegaura_02_coords;
 
-				var minLatitude = Math.min.apply(null, gpsCoordinates.map(function(coordinate) {
-					return coordinate.latitude;
-				}));
-
-				var minLongitude = Math.min.apply(null, gpsCoordinates.map(function(coordinate) {
-					return coordinate.longitude;
-				}));
-
-				var maxLatitude = Math.max.apply(null, gpsCoordinates.map(function(coordinate) {
-					return coordinate.latitude;
-				}));
-
-				var maxLongitude = Math.max.apply(null, gpsCoordinates.map(function(coordinate) {
-					return coordinate.longitude;
-				}));
-
-				var origin = {latitude: minLatitude, longitude: minLongitude};
-				var opposite = {latitude: maxLatitude, longitude: maxLongitude};
-				console.log(origin);
-				console.log(opposite);
-
-				function toRadian(angleInDegrees) {
-					return angleInDegrees * Math.PI / 180;
-				}
-
-				var relativeGpsCoordinates = gpsCoordinates.map(function(coordinate) {
-					return {latitude: coordinate.latitude - origin.latitude, longitude: coordinate.longitude - origin.longitude};
-				});
-
-				var earthRadius = 6378137.0;
-				var cartesianCoordinates = relativeGpsCoordinates.map(function(coordinate) {
-					return {x: Math.tan(toRadian(coordinate.latitude) / 2), y: Math.tan(toRadian(coordinate.longitude) / 2)};
-				});
-
-				console.log(cartesianCoordinates);
-
-
-				var maxX = Math.max.apply(null, cartesianCoordinates.map(function(coordinate) {
+				var minX = Math.min.apply(null, outside.map(function(coordinate) {
 					return coordinate.x;
 				}));
 
-				var maxY = Math.max.apply(null, cartesianCoordinates.map(function(coordinate) {
+				var minY = Math.min.apply(null, outside.map(function(coordinate) {
 					return coordinate.y;
 				}));
 
-				var topRight = {x: maxX, y: maxY};
-
-				console.log(topRight);
+				var origin = {x: minX, y: minY};
 
 				var canvas = document.getElementById('grid');
 				var ctx = canvas.getContext('2d');
 
-				var translatedCoordinates = gpsCoordinates.map(function(coordinate) {
-					return {latitude: coordinate.latitude - origin.latitude, longitude: coordinate.longitude - origin.longitude};
-				});
+				var scale = 60000;
+				ctx.scale(scale, scale);
+				ctx.translate(-origin.x, -origin.y);
 
-				var maxLatitudeTranslated = Math.max.apply(null, translatedCoordinates.map(function(coordinate) {
-					return coordinate.latitude;
-				}));
-
-				var maxLongitudeTranslated = Math.max.apply(null, translatedCoordinates.map(function(coordinate) {
-					return coordinate.longitude;
-				}));
-
-				var translatedOpposite = {latitude: maxLatitudeTranslated, longitude: maxLongitudeTranslated};
-
-				var scaledCoordinates = translatedCoordinates.map(function(coordinate) {
-					console.log(coordinate);
-					var scaledCoordinate =
-					{latitude: coordinate.latitude * 500 / translatedOpposite.latitude, longitude: coordinate.longitude * 250 / translatedOpposite.longitude};
-					console.log(scaledCoordinate);
-					return scaledCoordinate;
-				});
-
-				var first = scaledCoordinates.shift();
+				var firstOut = outside.shift();
 				ctx.beginPath();
-				ctx.moveTo(first.latitude, first.longitude);
+				ctx.moveTo(firstOut.x, firstOut.y);
 
-				scaledCoordinates.forEach(function(coordinate) {
-					ctx.lineTo(coordinate.latitude, coordinate.longitude);
+				outside.forEach(function(coordinate) {
+					ctx.lineTo(coordinate.x, coordinate.y);
 				});
 
-				ctx.lineWidth = 1;
+				ctx.lineWidth = 2 / scale;
 				ctx.strokeStyle = 'red';
+				ctx.stroke();
+
+				var firstIn = inside.shift();
+				ctx.beginPath();
+				ctx.moveTo(firstIn.x, firstIn.y);
+
+				inside.forEach(function(coordinate) {
+					ctx.lineTo(coordinate.x, coordinate.y);
+				});
+
+				ctx.lineWidth = 2 / scale;
+				ctx.strokeStyle = 'blue';
 				ctx.stroke();
 			};
 		</script>

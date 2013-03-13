@@ -15,10 +15,10 @@
     <script type="text/javascript" src="sodegaura_gmaps_02.js"></script>
 
     <script type="text/javascript">
-      function addPath(map, coords) {
+      function addPath(map, coords, color) {
         var path = new google.maps.Polyline({
           path: coords,
-          strokeColor: "#FF0000",
+          strokeColor: color,
           strokeOpacity: 1.0,
           strokeWeight: 2
         });
@@ -32,15 +32,40 @@
           zoom: 17,
           mapTypeId: google.maps.MapTypeId.SATELLITE
         };
-        var map = new google.maps.Map(document.getElementById("map_canvas"),
+        window.map = new google.maps.Map(document.getElementById("map_canvas"),
             mapOptions);
 
-        addPath(map, window.sodegaura_01_coords);
-        addPath(map, window.sodegaura_02_coords);
+        var startLine = [
+          new google.maps.LatLng(35.395000, 140.087851),
+          new google.maps.LatLng(35.394827, 140.088220)
+        ];
+
+        addPath(map, window.sodegaura_01_coords, "#FF0000");
+        addPath(map, window.sodegaura_02_coords, "#FF0000");
+
+        addPath(map, startLine, "#0000FF");
+
+        map.addListener('projection_changed', function() {
+          var proj = window.map.getProjection();
+          var insideCoords = window.sodegaura_01_coords.map(function(coord) {
+            var p = proj.fromLatLngToPoint(coord);
+            return '{x: ' + p.x + ', y: ' + p.y + '}';
+          }).join(',<br>');
+
+          var outsideCoords = window.sodegaura_02_coords.map(function(coord) {
+            var p = proj.fromLatLngToPoint(coord);
+            return '{x: ' + p.x + ', y: ' + p.y + '}';
+          }).join(',<br>');
+
+          document.getElementById("inside_coords").innerHTML = '[<br>' + insideCoords + '<br>]';
+          document.getElementById("outside_coords").innerHTML = '[<br>' + outsideCoords + '<br>]';
+        })
       }
     </script>
   </head>
   <body onload="initialize()">
-    <div id="map_canvas" style="width:100%; height:100%"></div>
+    <div id="map_canvas" style="width:50%; height:100%; float: left;"></div>
+    <div id="inside_coords" style="width:25%; height:100%; float: left;">Hello</div>
+    <div id="outside_coords" style="width:25%; height:100%; float: left;">Hello2</div>
   </body>
 </html>
