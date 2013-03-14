@@ -26,6 +26,37 @@
         path.setMap(map);
       }
 
+      function findBoundingRectangle(cloud) {
+        var minX, minY, maxX, maxY;
+
+        minX = Math.min.apply(null, cloud.map(function(point) {
+          return point.lat();
+        }));
+
+        minY = Math.min.apply(null, cloud.map(function(point) {
+          return point.lng();
+        }));
+
+        maxX = Math.max.apply(null, cloud.map(function(point) {
+          return point.lat();
+        }));
+
+        maxY = Math.max.apply(null, cloud.map(function(point) {
+          return point.lng();
+        }));
+
+        var result = [
+          new google.maps.LatLng(minX, minY),
+          new google.maps.LatLng(minX, maxY),
+          new google.maps.LatLng(maxX, maxY),
+          new google.maps.LatLng(maxX, minY),
+          new google.maps.LatLng(minX, minY)
+        ];
+
+        console.log(result);
+        return result;
+      };
+
       function initialize() {
         var mapOptions = {
           center: new google.maps.LatLng(35.393795,140.089604),
@@ -40,6 +71,7 @@
           new google.maps.LatLng(35.394827, 140.088220)
         ];
 
+        addPath(map, findBoundingRectangle(window.sodegaura_01_coords), "#0000FF");
         addPath(map, window.sodegaura_01_coords, "#FF0000");
         addPath(map, window.sodegaura_02_coords, "#FF0000");
 

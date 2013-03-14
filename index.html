@@ -10,7 +10,9 @@
 		<script>
 			function boundingRectangle(northWest, southEast) {
 				var origin = northWest,
-					opposite = southEast;
+					opposite = southEast,
+					translation = {x: 0, y: 0},
+					scaling = 1;
 
 				function BoundingRectangle() {
 					return this;
@@ -25,17 +27,29 @@
 				};
 
 				BoundingRectangle.prototype.moveTo = function(newOrigin) {
-					opposite = {x: opposite.x - (origin.x - newOrigin.x), y: opposite.y - (origin.y - newOrigin.y)};
+					translation = {x: (origin.x - newOrigin.x), y: (origin.y - newOrigin.y)};
+
+					opposite = {x: opposite.x - translation.x, y: opposite.y - translation.y};
 					origin = newOrigin;
 				};
 
 				BoundingRectangle.prototype.scale = function(scale) {
-					opposite = {x: opposite.x * scale, y: opposite.y * scale};
+					scaling = scale;
+					opposite = {x: opposite.x * scaling, y: opposite.y * scaling};
 				};
 
 				BoundingRectangle.prototype.drawOn = function(context, strokeColor) {
 					context.strokeStyle = "red";
 					context.strokeRect(origin.x, origin.y, width(), height());
+				};
+
+				BoundingRectangle.prototype.normalize = function(point) {
+					var translatedPoint = {x: point.x - translation.x, y: point.y - translation.y};
+					var scaledPoint = {x: translatedPoint.x * scaling, y: translatedPoint.y * scaling};
+					console.log(point);
+					console.log(translatedPoint);
+					console.log(scaledPoint);
+					return scaledPoint;
 				};
 
 				return new BoundingRectangle();
@@ -73,39 +87,34 @@
 				var ctx = canvas.getContext('2d');
 
 				boundingRectangle.moveTo({x: 0, y: 0});
-				boundingRectangle.scale(60000);
-				boundingRectangle.drawOn(ctx, 'red');				
-				// var scale = 60000;
-				// ctx.scale(scale, scale);
-				// ctx.translate(-origin.x, -origin.y);
+				boundingRectangle.scale(180000);
+				boundingRectangle.drawOn(ctx, 'blue');
 
-				// var firstOut = outside.shift();
-				// ctx.beginPath();
-				// ctx.moveTo(firstOut.x, firstOut.y);
+				var firstOut = boundingRectangle.normalize(outside.shift());
+				ctx.beginPath();
+				ctx.moveTo(firstOut.x, firstOut.y);
 
-				// outside.forEach(function(coordinate) {
-				// 	ctx.lineTo(coordinate.x, coordinate.y);
-				// });
+				outside.forEach(function(point) {
+					var normalizedPoint = boundingRectangle.normalize(point);
+					ctx.lineTo(normalizedPoint.x, normalizedPoint.y);
+				});
+				ctx.strokeStyle = 'red';
+				ctx.stroke();
 
-				// ctx.lineWidth = 2 / scale;
-				// ctx.strokeStyle = 'red';
-				// ctx.stroke();
+				var firstIn = boundingRectangle.normalize(inside.shift());
+				ctx.beginPath();
+				ctx.moveTo(firstIn.x, firstIn.y);
 
-				// var firstIn = inside.shift();
-				// ctx.beginPath();
-				// ctx.moveTo(firstIn.x, firstIn.y);
-
-				// inside.forEach(function(coordinate) {
-				// 	ctx.lineTo(coordinate.x, coordinate.y);
-				// });
-
-				// ctx.lineWidth = 2 / scale;
-				// ctx.strokeStyle = 'blue';
-				// ctx.stroke();
+				inside.forEach(function(point) {
+					var normalizedPoint = boundingRectangle.normalize(point);
+					ctx.lineTo(normalizedPoint.x, normalizedPoint.y);
+				});
+				ctx.strokeStyle = 'green';
+				ctx.stroke();
 			};
 		</script>
 	</head>
 	<body>
-			<canvas id="grid" width="500" height="250" style="border-style:solid; border-width:1px;"></canvas>
+			<canvas id="grid" width="1000" height="700" style="border-style:solid; border-width:1px;"></canvas>
 	</body>
 </html>
