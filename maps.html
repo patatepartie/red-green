@@ -15,6 +15,83 @@
     <script type="text/javascript" src="sodegaura_gmaps_02.js"></script>
 
     <script type="text/javascript">
+      window.BoundingRectangle = (function defineBoundingRectangle() {
+        function boundingRectangle(northWest, southEast) {
+          var origin = northWest,
+            opposite = southEast,
+            translation = {x: 0, y: 0},
+            scaling = 1;
+
+          function BoundingRectangle() {
+            return this;
+          };
+
+          function width() {
+            return opposite.x - origin.x;
+          };
+
+          function height() {
+            return opposite.y - origin.y;
+          };
+
+          BoundingRectangle.prototype.moveTo = function(newOrigin) {
+            translation = {x: (origin.x - newOrigin.x), y: (origin.y - newOrigin.y)};
+
+            opposite = {x: opposite.x - translation.x, y: opposite.y - translation.y};
+            origin = newOrigin;
+          };
+
+          BoundingRectangle.prototype.scale = function(scale) {
+            scaling = scale;
+            opposite = {x: opposite.x * scaling, y: opposite.y * scaling};
+          };
+
+          BoundingRectangle.prototype.drawOn = function(context, strokeColor) {
+            context.strokeStyle = "red";
+            context.strokeRect(origin.x, origin.y, width(), height());
+          };
+
+          BoundingRectangle.prototype.computerBestScale = function(containerArea) {
+            var xScale = containerArea.width / width(),
+              yScale = containerArea.height / height();
+
+            return Math.min(xScale, yScale);
+          };
+
+          BoundingRectangle.prototype.normalize = function(point) {
+            var translatedPoint = {x: point.x - translation.x, y: point.y - translation.y};
+            var scaledPoint = {x: translatedPoint.x * scaling, y: translatedPoint.y * scaling};
+            return scaledPoint;
+          };
+
+          return new BoundingRectangle();
+        };
+
+        return {
+          from: function(cloud) {
+            var minX, minY, maxX, maxY;
+
+            minX = Math.min.apply(null, cloud.map(function(point) {
+              return point.x;
+            }));
+
+            minY = Math.min.apply(null, cloud.map(function(point) {
+              return point.y;
+            }));
+
+            maxX = Math.max.apply(null, cloud.map(function(point) {
+              return point.x;
+            }));
+
+            maxY = Math.max.apply(null, cloud.map(function(point) {
+              return point.y;
+            }));
+
+            return boundingRectangle({x: minX, y: minY}, {x: maxX, y: maxY});
+          }
+        };
+      })();
+
       function addPath(map, coords, color) {
         var path = new google.maps.Polyline({
           path: coords,
@@ -53,7 +130,6 @@
           new google.maps.LatLng(minX, minY)
         ];
 
-        console.log(result);
         return result;
       };
 
@@ -74,30 +150,40 @@
         addPath(map, findBoundingRectangle(window.sodegaura_01_coords), "#0000FF");
         addPath(map, window.sodegaura_01_coords, "#FF0000");
         addPath(map, window.sodegaura_02_coords, "#FF0000");
-
         addPath(map, startLine, "#0000FF");
 
         map.addListener('projection_changed', function() {
           var proj = window.map.getProjection();
           var insideCoords = window.sodegaura_01_coords.map(function(coord) {
-            var p = proj.fromLatLngToPoint(coord);
-            return '{x: ' + p.x + ', y: ' + p.y + '}';
-          }).join(',<br>');
+            return proj.fromLatLngToPoint(coord);
+          });
 
           var outsideCoords = window.sodegaura_02_coords.map(function(coord) {
-            var p = proj.fromLatLngToPoint(coord);
-            return '{x: ' + p.x + ', y: ' + p.y + '}';
-          }).join(',<br>');
+            return proj.fromLatLngToPoint(coord);
+          });
 
-          document.getElementById("inside_coords").innerHTML = '[<br>' + insideCoords + '<br>]';
-          document.getElementById("outside_coords").innerHTML = '[<br>' + outsideCoords + '<br>]';
+          var boundingRectangle = BoundingRectangle.from(outsideCoords);
+          boundingRectangle.moveTo({x: 0, y: 0});
+          var scale = boundingRectangle.computerBestScale({width: 100, height: 100});
+          boundingRectangle.scale(scale);
+
+          var outside = outsideCoords.map(function(coord) {
+            return boundingRectangle.normalize(coord);
+          });
+
+          var inside = insideCoords.map(function(coord) {
+            return boundingRectangle.normalize(coord);
+          });
+
+          document.getElementById("inside_coords").innerHTML = JSON.stringify(inside);
+          document.getElementById("outside_coords").innerHTML = JSON.stringify(outside);
         })
       }
     </script>
   </head>
   <body onload="initialize()">
-    <div id="map_canvas" style="width:50%; height:100%; float: left;"></div>
-    <div id="inside_coords" style="width:25%; height:100%; float: left;">Hello</div>
-    <div id="outside_coords" style="width:25%; height:100%; float: left;">Hello2</div>
+    <div id="map_canvas" style="width:50%; height:100%;"></div>
+    <div id="outside_coords" style="width:50%; float: left; border-style: solid; border-width: 1px;">Hello2</div>
+    <div id="inside_coords" style="width:49%; float: left; border-style: solid; border-width: 1px;">Hello</div>
   </body>
 </html>
