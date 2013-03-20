@@ -1,8 +1,11 @@
-define([], function() {
+define(['text!templates/path.html'], function(template) {
 	var PathView = Backbone.View.extend({
 		tagName: 'li',
+
+		template: _.template(template),
 		
 		events: {
+			'click .toggle': 'toggleIncluded'
 		},
 		
 		initialize: function() {
@@ -12,9 +15,13 @@ define([], function() {
 			var self = this,
 				$el = $(self.el);
 			
-			$el.html(self.model.get('name'));
+			$el.html(self.template(self.model.toJSON()));
 
 			return self;
+		},
+
+		toggleIncluded: function() {
+			this.model.toggle();
 		}
 	});
 

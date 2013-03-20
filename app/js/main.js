@@ -18,10 +18,11 @@ requirejs.config({
 			exports: 'Backbone'
 		},
 		'backbone.localstorage': ['backbone'],
-		'app': ['underscore', 'backbone']
+		'app': ['underscore', 'backbone'],
+		'config': ['underscore']
 	}
 });
 
-require(['app'], function(App) {
+require(['app', 'config'], function(App) {
 	window.redGreen = new App();
 });

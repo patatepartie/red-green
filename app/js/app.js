@@ -2,7 +2,8 @@ define([
 	'jquery',
 	'views/pathManager',
 	'views/map',
-	'collections/pathList'
+	'collections/pathList',
+	'config'
 	],
 	
 	function($, PathManagerView, MapView, PathList) {
@@ -14,7 +15,7 @@ define([
 			self.views.pathManager = new PathManagerView({pathList: self.collections.pathList});
 			self.views.pathManager.render();
 
-			self.views.map = new MapView();
+			self.views.map = new MapView({pathList: self.collections.pathList});
 			self.views.map.render();
 		};
 	
