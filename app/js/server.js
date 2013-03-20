@@ -3,22 +3,30 @@ define(['jquery'], function($) {
 		_.extend(this, Backbone.Events);
 
 		this.pathList = pathList;
-
-		this.listenTo(this.pathList, 'change', this.pushChanges());
 	};
 
-	_.extend()
-	
 	Server.prototype = {
 		startupSync: function() {
 			var self = this;
 			$.getJSON("/gps-paths", function(data) {
 				self.pathList.reset(data);
+
+				self.listenTo(self.pathList, 'add', self.sendCreatePathCommand());
+				self.listenTo(self.pathList, 'change', self.sendModifyCoordinatesCommand());
+				self.listenTo(self.pathList, 'remove', self.sendRemovePathCommand());
 			});
 		},
 
-		pushChanges: function() {
-			console.log("changes occured");
+		sendCreatePathCommand: function(event) {
+			console.log(event);
+		},
+
+		sendModifyCoordinatesCommand: function(event) {
+			console.log(event);
+		},
+
+		sendRemovePathCommand: function(event) {
+
 		}
 	};
 	
