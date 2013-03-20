@@ -13,14 +13,9 @@ define(['views/path'], function(PathView) {
 			this.listenTo(this.pathList, 'add', this.addOne);
 			this.listenTo(this.pathList, 'reset', this.addAll);
 			this.listenTo(this.pathList, 'all', this.render);
-
-			this.pathList.fetch();
 		},
 		
 		render: function() {
-			var self = this,
-				$el = $(self.el);
-			
 			return this;
 		},
 

@@ -4,7 +4,7 @@ define(function() {
 			return {
 				name: '',
 				coordinates: [],
-				included: true
+				included: false
 			}
 		},
 

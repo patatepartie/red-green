@@ -3,10 +3,11 @@ define([
 	'views/pathManager',
 	'views/map',
 	'collections/pathList',
+	'server',
 	'config'
 	],
 	
-	function($, PathManagerView, MapView, PathList) {
+	function($, PathManagerView, MapView, PathList, Server) {
 		var App = function() {
 			var self = this;
 
@@ -17,6 +18,9 @@ define([
 
 			self.views.map = new MapView({pathList: self.collections.pathList});
 			self.views.map.render();
+			
+			self.server = new Server(self.collections.pathList);
+			self.server.startupSync();
 		};
 	
 		App.prototype = {
