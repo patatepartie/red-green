@@ -36,7 +36,11 @@ define(['views/path'], function(PathView) {
 			var reader = new FileReader();
 			reader.onload = function(readEvent) {
 				var path = JSON.parse(readEvent.target.result);
-				self.pathList.create({name: path.pathName, coordinates: path.gpsCoordinates});
+				if (self.pathList.containsPathNamed(path.pathName)) {
+					self.pathList.updateCoordinates(path.pathName, path.gpsCoordinates);
+				} else {
+					self.pathList.addPath(path.pathName, path.gpsCoordinates);
+				}
 			};
 
 			reader.readAsText(loadEvent.target.files[0]);
