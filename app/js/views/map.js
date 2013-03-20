@@ -33,8 +33,8 @@ define(['gmaps'], function(gmaps) {
 
 			
 			var mapOptions = {
-				center: new gmaps.LatLng(35.393795,140.089604),
-				zoom: 17,
+				center: new gmaps.LatLng(0, 0),
+				zoom: 2,
 				mapTypeId: gmaps.MapTypeId.SATELLITE
 			};
 			
@@ -46,10 +46,22 @@ define(['gmaps'], function(gmaps) {
 			
 			this.clearGmapsPath();
 
+			this.bounds = new gmaps.LatLngBounds();
+
 			self.pathList.included().forEach(function(path) {
 				var gmapsPath = toGmapsCoord(path.get('coordinates'));
+				gmapsPath.forEach(function(gmapsCoord) {
+					self.bounds.extend(gmapsCoord);
+				});
 				self.gmapsPaths.push(addPath(self.map, gmapsPath, 'red'));
 			});
+
+			if (this.bounds.isEmpty()) {
+				this.map.panTo(new gmaps.LatLng(0, 0));
+				this.map.setZoom(2);
+			} else {
+				this.map.fitBounds(this.bounds);
+			}
 
 			return this;
 		},
