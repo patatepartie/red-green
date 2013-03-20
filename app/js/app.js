@@ -1,24 +1,26 @@
 define([
 	'jquery',
 	'views/pathManager',
-	'views/map'
+	'views/map',
+	'collections/pathList'
 	],
 	
-	function($, PathManagerView, MapView) {
+	function($, PathManagerView, MapView, PathList) {
 		var App = function() {
 			var self = this;
 
-			self.views.pathManager = new PathManagerView();
+			self.collections.pathList = new PathList();
+
+			self.views.pathManager = new PathManagerView({pathList: self.collections.pathList});
 			self.views.pathManager.render();
 
-			self.views.map = new MapView({models: self.models});
+			self.views.map = new MapView();
 			self.views.map.render();
 		};
 	
 		App.prototype = {
 				views: {},
-				collections: {},
-				models: {}
+				collections: {}
 		};
 	
 		return App;

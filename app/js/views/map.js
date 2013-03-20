@@ -5,8 +5,7 @@ define(['gmaps'], function(gmaps) {
 		events: {
 		},
 		
-		initialize: function(options) {
-			this.models = options.models;
+		initialize: function() {
 		},
 		
 		render: function() {
