@@ -32,7 +32,10 @@ define(['jquery'], function($) {
 		},
 
 		sendRemovePathCommand: function(event) {
-            console.log(event);
+            $.ajax({
+                url: '/gps-paths/' + event.attributes.name,
+                type: 'DELETE'
+            });
 		}
 	};
 	

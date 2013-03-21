@@ -34,6 +34,11 @@ app.put('/gps-paths/:pathName', function(req, res) {
     
 	res.send('OK');
 });
+app.delete('/gps-paths/:pathName', function(req, res) {
+    console.log('Delete gps path ' + req.params.pathName);
+        
+    res.send('OK');
+});
 
 app.use(function(err, req, res, next) {
 	console.error(err.stack);
