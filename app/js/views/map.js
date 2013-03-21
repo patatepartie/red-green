@@ -29,6 +29,7 @@ define(['gmaps'], function(gmaps) {
 
 			this.pathList = options.pathList;
 
+            this.listenTo(this.pathList, 'reset', this.render);
 			this.listenTo(this.pathList, 'change', this.render);
 
 			
@@ -44,11 +45,13 @@ define(['gmaps'], function(gmaps) {
 		render: function() {
 			var self = this;
 			
-			this.clearGmapsPath();
+            this.clearGmapsPath();
 
 			this.bounds = new gmaps.LatLngBounds();
 
-			self.pathList.included().forEach(function(path) {
+			var includedPaths = self.pathList.included();
+            console.log(includedPaths);
+            includedPaths.forEach(function(path) {
 				var gmapsPath = toGmapsCoord(path.get('coordinates'));
 				gmapsPath.forEach(function(gmapsCoord) {
 					self.bounds.extend(gmapsCoord);
@@ -57,7 +60,7 @@ define(['gmaps'], function(gmaps) {
 			});
 
 			if (this.bounds.isEmpty()) {
-				this.map.panTo(new gmaps.LatLng(0, 0));
+                this.map.panTo(new gmaps.LatLng(0, 0));
 				this.map.setZoom(2);
 			} else {
 				this.map.fitBounds(this.bounds);

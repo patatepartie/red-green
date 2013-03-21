@@ -11,10 +11,15 @@ app.use('/js/lib/', express.static('node_modules/requirejs'));
 app.use('/node_modules', express.static('node_modules'));
 
 app.get('/gps-paths', function(req, res) {
-	console.log('Request: media');
+	console.log('Request all gps paths');
 	res.setHeader('Content-Type', 'application/json');
 	
 	res.send(gpsPaths);
+});
+app.post('/gps-paths', function(req, res) {
+    console.log('Post new gps path');
+	gpsPaths.push(req.body);
+	res.send('OK');
 });
 
 app.use(function(err, req, res, next) {
