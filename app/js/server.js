@@ -24,7 +24,11 @@ define(['jquery'], function($) {
 		},
 
 		sendModifyCoordinatesCommand: function(event) {
-			console.log(event);
+            $.ajax({
+                url: '/gps-paths/' + event.attributes.name,
+                type: 'PUT',
+                data: {gpsCoordinates: event.attributes.coordinates}
+            });
 		},
 
 		sendRemovePathCommand: function(event) {
