@@ -6,7 +6,7 @@
         <script type="text/javascript">
             window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem;
             window.redGreen = {
-                lastUsed: 'default',
+                fileName: 'default',
                 files: {}
             };
                         
@@ -63,7 +63,6 @@
                                 var readEntries = function() {
                                     dirReader.readEntries (function(files) {
                                         if (files.length) {
-                                            console.log(files);
                                             Array.prototype.forEach.call(files, function(file) {
                                                 var parts,
                                                     fileName,
@@ -81,6 +80,14 @@
                                                     } else {
                                                         window.redGreen.files[fileName] = number;
                                                     }
+                                                    
+                                                    file.getMetadata(function(metadata) {
+                                                        if (!window.redGreen.lastUsed || window.redGreen.lastUsed.getTime() < metadata.modificationTime.getTime()) {
+                                                            window.redGreen.lastUsed = metadata.modificationTime;
+                                                            window.redGreen.fileName = fileName;
+                                                            document.querySelector('#fileName').value = window.redGreen.fileName;
+                                                        }
+                                                    });
                                                 }
                                             });
                                             readEntries();
@@ -94,11 +101,11 @@
                     }, function(e) {
                         console.log('Error', e);
                     }
-                );                
+                );
             };
             
             function start() {
-                var fileName = window.redGreen.lastUsed;
+                var fileName = window.redGreen.fileName;
                 var number; 
                 if (window.redGreen.files.hasOwnProperty(fileName)) {
                     number = window.redGreen.files[fileName] + 1;
@@ -119,7 +126,7 @@
             function changeFileName() {
                 var fileName = document.querySelector('#fileName').value;
                 if (fileName && fileName.trim() !== "") {
-                    window.redGreen.lastUsed = fileName;
+                    window.redGreen.fileName = fileName;
                 }
             }
         </script>
