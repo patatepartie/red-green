@@ -50,7 +50,6 @@ define(['gmaps'], function(gmaps) {
 			this.bounds = new gmaps.LatLngBounds();
 
 			var includedPaths = self.pathList.included();
-            console.log(includedPaths);
             includedPaths.forEach(function(path) {
 				var gmapsPath = toGmapsCoord(path.get('coordinates'));
 				gmapsPath.forEach(function(gmapsCoord) {
