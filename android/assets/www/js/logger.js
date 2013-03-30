@@ -46,7 +46,7 @@ define([], function() {
 	
 	var Logger = function(rootDirectory) {
 		this.rootDirectory = rootDirectory;
-		this.fileName = 'default';
+		this.filename = 'default';
 		this.files = {};                    
 	};
 	
@@ -55,42 +55,40 @@ define([], function() {
 		
 		createDir(fs.root, self.rootDirectory.split('/'), function(dir) {
 			var dirReader = dir.createReader();
-			console.log(dir.name);
 			
 			var readEntries = function() {
 				dirReader.readEntries (function(files) {
 					if (files.length) {
 						Array.prototype.forEach.call(files, function(file) {
 							var parts,
-								fileName,
+								filename,
 								number;
 							
 							console.log(file.name);
 							if (/(.*)-(\d+)\.txt$/.test(file.name)) {
-								console.log(file.name);
 								parts = file.name.match(/(.*)-(\d+)\.txt$/);
-								fileName = parts[1];
+								filename = parts[1];
 								number = parseInt(parts[2], 10);
 								
-								if (self.files.hasOwnProperty(fileName)) {
-									if (number > self.files[fileName]) {
-										self.files[fileName] = number;
+								if (self.files.hasOwnProperty(filename)) {
+									if (number > self.files[filename]) {
+										self.files[filename] = number;
 									}
 								} else {
-									self.files[fileName] = number;
+									self.files[filename] = number;
 								}
 								
 								file.getMetadata(function(metadata) {
 									if (!self.lastUsed || self.lastUsed.getTime() < metadata.modificationTime.getTime()) {
 										self.lastUsed = metadata.modificationTime;
-										self.filename = fileName;
-										
-										callback(fileName);
+										self.filename = filename;
 									}
 								});
 							}
 						});
 						readEntries();
+					} else {
+						callback(self.filename);
 					}
 				}, errorHandler);
 			};
@@ -101,16 +99,16 @@ define([], function() {
 	
 	Logger.prototype.write = function(writer) {
 		var self = this;
-		var fileName = self.filename;
+		var filename = self.filename;
 		var number; 
-		if (self.files.hasOwnProperty(fileName)) {
-			number = self.files[fileName] + 1;
+		if (self.files.hasOwnProperty(filename)) {
+			number = self.files[filename] + 1;
 		} else {
 			number = 0;
 		}
 		
-		self.files[fileName] = number;
-		var fullName = fileName + '-' + number + '.txt';
+		self.files[filename] = number;
+		var fullName = filename + '-' + number + '.txt';
 		
 		window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fs) {
 			fs.root.getFile(self.rootDirectory + '/' + fullName, {create: true}, function(fileEntry) {

@@ -8,21 +8,21 @@ define([ 'jquery', 'logger', 'cordova' ], function($, Logger) {
 
 			window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem) {
 				log.prepare(fileSystem, function(filename) {
-					$('#fileName').value = filename;
+					$('#filename').val(filename);
 					
 					$('#change').click(function(event) {
-						var fileName = $('#fileName').value;
+						var fileName = $('#filename').val();
 		                log.changeFile(fileName);
 					});
 					
 					$('#start').click(function(event) {
 						$('#start').hide();
-						$('#stop').unhide();
+						$('#stop').show();
 					});
 					
 					$('#stop').click(function(event) {
 						$('#stop').hide();
-						$('#start').unhide();
+						$('#start').show();
 					});
 				});
 			}, function(error) {
