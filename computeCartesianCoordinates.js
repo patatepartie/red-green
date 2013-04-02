@@ -36,9 +36,11 @@ conv = ({
 	}
 });
 
+var coordIndex = 0;
 lap1.cartesianCoordinates = lap1.gpsCoordinates.map(function(coord) {
 	var res = conv.ll2m(coord.lat, coord.lng);
 	res.speed = parseFloat(coord.speed);
+	res.id = coordIndex++;
 	return res;
 });
 
