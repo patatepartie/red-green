@@ -11,122 +11,15 @@
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBbmHfS_lnio4OUmcX8KTE-hi4Tk4exSeo&sensor=false">
     </script>
 
-    <script type="text/javascript" src="sodegaura_gmaps_01.js"></script>
-    <script type="text/javascript" src="sodegaura_gmaps_02.js"></script>
+    <script type="text/javascript" src="lap1.json"></script>
+    <script type="text/javascript" src="lap2.json"></script>
 
     <script type="text/javascript">
-      window.conv = ({
-        r_major:6378137.0,//Equatorial Radius, WGS84
-        r_minor:6356752.314245179,//defined as constant
-        f:298.257223563,//1/f=(a-b)/a , a=r_major, b=r_minor
-        deg2rad:function(d)
-        {
-          var r=d*(Math.PI/180.0);
-          return r;
-        },
-        ll2m:function(lat,lon) //lat lon to mercator
-        {
-          //lat, lon in rad
-          var x=this.r_major * this.deg2rad(lon);
-
-          if (lat > 89.5) lat = 89.5;
-          if (lat < -89.5) lat = -89.5;
-
-
-          var temp = this.r_minor / this.r_major;
-          var es = 1.0 - (temp * temp);
-          var eccent = Math.sqrt(es);
-
-          var phi = this.deg2rad(lat);
-
-          var sinphi = Math.sin(phi);
-
-          var con = eccent * sinphi;
-          var com = .5 * eccent;
-          var con2 = Math.pow((1.0-con)/(1.0+con), com);
-          var ts = Math.tan(.5 * (Math.PI*0.5 - phi))/con2;
-          var y = 0 - this.r_major * Math.log(ts);
-          var ret={'x':x,'y':y};
-          return ret;
-        }
-      });
-
-      window.BoundingRectangle = (function defineBoundingRectangle() {
-        function boundingRectangle(northWest, southEast) {
-          var origin = northWest,
-            opposite = southEast,
-            translation = {x: 0, y: 0},
-            scaling = 1;
-
-          function BoundingRectangle() {
-            return this;
-          };
-
-          function width() {
-            return opposite.x - origin.x;
-          };
-
-          function height() {
-            return opposite.y - origin.y;
-          };
-
-          BoundingRectangle.prototype.moveTo = function(newOrigin) {
-            translation = {x: (origin.x - newOrigin.x), y: (origin.y - newOrigin.y)};
-
-            opposite = {x: opposite.x - translation.x, y: opposite.y - translation.y};
-            origin = newOrigin;
-          };
-
-          BoundingRectangle.prototype.scale = function(scale) {
-            scaling = scale;
-            opposite = {x: opposite.x * scaling, y: opposite.y * scaling};
-          };
-
-          BoundingRectangle.prototype.drawOn = function(context, strokeColor) {
-            context.strokeStyle = "red";
-            context.strokeRect(origin.x, origin.y, width(), height());
-          };
-
-          BoundingRectangle.prototype.computerBestScale = function(containerArea) {
-            var xScale = containerArea.width / width(),
-              yScale = containerArea.height / height();
-
-            return Math.min(xScale, yScale);
-          };
-
-          BoundingRectangle.prototype.normalize = function(point) {
-            var translatedPoint = {x: point.x - translation.x, y: point.y - translation.y};
-            var scaledPoint = {x: translatedPoint.x * scaling, y: translatedPoint.y * scaling};
-            return scaledPoint;
-          };
-
-          return new BoundingRectangle();
-        };
-
-        return {
-          from: function(cloud) {
-            var minX, minY, maxX, maxY;
-
-            minX = Math.min.apply(null, cloud.map(function(point) {
-              return point.x;
-            }));
-
-            minY = Math.min.apply(null, cloud.map(function(point) {
-              return point.y;
-            }));
-
-            maxX = Math.max.apply(null, cloud.map(function(point) {
-              return point.x;
-            }));
-
-            maxY = Math.max.apply(null, cloud.map(function(point) {
-              return point.y;
-            }));
-
-            return boundingRectangle({x: minX, y: minY}, {x: maxX, y: maxY});
-          }
-        };
-      })();
+      function toGmapsCoord(gpsCoords) {
+        return gpsCoords.map(function(gpsCoord) {
+          return new google.maps.LatLng(gpsCoord.lat, gpsCoord.lng);
+        });
+      };
 
       function addPath(map, coords, color) {
         var path = new google.maps.Polyline({
@@ -139,108 +32,84 @@
         path.setMap(map);
       }
 
-      function findBoundingRectangle(cloud) {
-        var minX, minY, maxX, maxY;
-
-        minX = Math.min.apply(null, cloud.map(function(point) {
-          return point.lat();
-        }));
-
-        minY = Math.min.apply(null, cloud.map(function(point) {
-          return point.lng();
-        }));
-
-        maxX = Math.max.apply(null, cloud.map(function(point) {
-          return point.lat();
-        }));
-
-        maxY = Math.max.apply(null, cloud.map(function(point) {
-          return point.lng();
-        }));
-
-        var result = [
-          new google.maps.LatLng(minX, minY),
-          new google.maps.LatLng(minX, maxY),
-          new google.maps.LatLng(maxX, maxY),
-          new google.maps.LatLng(maxX, minY),
-          new google.maps.LatLng(minX, minY)
-        ];
-
-        return result;
-      };
-
       function initialize() {
         var mapOptions = {
-          center: new google.maps.LatLng(35.393795,140.089604),
-          zoom: 17,
+          center: new google.maps.LatLng(0, 0),
+          zoom: 2,
           mapTypeId: google.maps.MapTypeId.SATELLITE
         };
-        window.map = new google.maps.Map(document.getElementById("map_canvas"),
-            mapOptions);
+        window.map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
+        var bounds = new google.maps.LatLngBounds();
 
-        var startLine = [
-          new google.maps.LatLng(35.395000, 140.087851),
-          new google.maps.LatLng(35.394827, 140.088220)
-        ];
+        var lap1Gps = toGmapsCoord(lap1.gpsCoordinates);
+        var lap2Gps = toGmapsCoord(lap2.gpsCoordinates);
 
-        addPath(map, findBoundingRectangle(window.sodegaura_01_coords), "#0000FF");
-        addPath(map, window.sodegaura_01_coords, "#FF0000");
-        addPath(map, window.sodegaura_02_coords, "#FF0000");
-        addPath(map, startLine, "#0000FF");
+        var lap1Path = new google.maps.Polyline({
+          path: lap1Gps,
+          strokeColor: "#FF0000",
+          strokeOpacity: 1.0,
+          strokeWeight: 1,
+          map: window.map
+        });
 
-        map.addListener('projection_changed', function() {
-          var proj = window.map.getProjection();
-          var insideCoords = window.sodegaura_01_coords.map(function(coord) {
-            return proj.fromLatLngToPoint(coord);
+        var lap1Index = 0;
+        lap1Gps.forEach(function(coord) {
+          bounds.extend(coord);
+          var populationOptions = {
+            strokeColor: "#0000FF",
+            strokeOpacity: 1.0,
+            strokeWeight: 1,
+            fillColor: "#0000FF",
+            fillOpacity: 1.0,
+            map: window.map,
+            center: coord,
+            radius: 1
+          };
+          circle = new google.maps.Circle(populationOptions);
+          var infowindow = new google.maps.InfoWindow({
+              position: coord,
+              content: "" + lap1Index++
           });
-
-          var outsideCoords = window.sodegaura_02_coords.map(function(coord) {
-            return proj.fromLatLngToPoint(coord);
+          google.maps.event.addListener(circle, 'mouseover', function() {
+            infowindow.open(map);
           });
-
-          var boundingRectangle = BoundingRectangle.from(outsideCoords);
-          boundingRectangle.moveTo({x: 0, y: 0});
-          var scale = boundingRectangle.computerBestScale({width: 100, height: 100});
-          boundingRectangle.scale(scale);
-
-          var outside = outsideCoords.map(function(coord) {
-            return boundingRectangle.normalize(coord);
+          google.maps.event.addListener(circle, 'mouseout', function() {
+            infowindow.close();
           });
+        });
 
-          var inside = insideCoords.map(function(coord) {
-            return boundingRectangle.normalize(coord);
+        var lap2Index = 0;
+        lap2Gps.forEach(function(coord) {
+          bounds.extend(coord);
+          var populationOptions = {
+            strokeColor: "#FF00FF",
+            strokeOpacity: 1.0,
+            strokeWeight: 1,
+            fillColor: "#FF00FF",
+            fillOpacity: 1.0,
+            map: window.map,
+            center: coord,
+            radius: 1
+          };
+          circle = new google.maps.Circle(populationOptions);
+          var infowindow = new google.maps.InfoWindow({
+              position: coord,
+              content: "" + lap2Index++
           });
-
-          var outsideMerca = window.sodegaura_01_coords.map(function(gpsCoord) {
-            return conv.ll2m(-gpsCoord.lat(), gpsCoord.lng());
+          google.maps.event.addListener(circle, 'mouseover', function() {
+            infowindow.open(map);
           });
-
-          var insideMerca = window.sodegaura_02_coords.map(function(gpsCoord) {
-            return conv.ll2m(-gpsCoord.lat(), gpsCoord.lng());
+          google.maps.event.addListener(circle, 'mouseout', function() {
+            infowindow.close();
           });
+        });
 
-          var boundingRectangleMerc = BoundingRectangle.from(outsideMerca);
-          boundingRectangleMerc.moveTo({x: 0, y: 0});
-          var scale = boundingRectangleMerc.computerBestScale({width: 100, height: 100});
-          boundingRectangleMerc.scale(scale);
 
-          var outsideMercaNorm = outsideMerca.map(function(coord) {
-            return boundingRectangleMerc.normalize(coord);
-          });
-
-          var insideMercaNorm = insideMerca.map(function(coord) {
-            return boundingRectangleMerc.normalize(coord);
-          });
-
-          document.getElementById("inside_coords").innerHTML = JSON.stringify(outsideMercaNorm);
-          document.getElementById("outside_coords").innerHTML = JSON.stringify(insideMercaNorm);
-        })
+        window.map.fitBounds(bounds);
       }
     </script>
   </head>
   <body onload="initialize()">
-    <div id="map_canvas" style="width:50%; height:100%;"></div>
-    <div id="outside_coords" style="width:50%; float: left; border-style: solid; border-width: 1px;">Hello2</div>
-    <div id="inside_coords" style="width:49%; float: left; border-style: solid; border-width: 1px;">Hello</div>
+    <div id="map_canvas"></div>
   </body>
 </html>
