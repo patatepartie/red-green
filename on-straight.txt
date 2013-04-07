@@ -1,0 +1,8 @@
+{"timestamp":1365310914000,"coords":{"heading":32.099998474121094,"altitude":127.19999694824219,"latitude":35.39374261,"accuracy":3,"longitude":140.08703747,"speed":29,"altitudeAccuracy":null}}
+{"timestamp":1365310915000,"coords":{"heading":31.100000381469727,"altitude":127.5999984741211,"latitude":35.39398079,"accuracy":3,"longitude":140.08721472,"speed":30.5,"altitudeAccuracy":null}}
+{"timestamp":1365310916000,"coords":{"heading":31.100000381469727,"altitude":127.9000015258789,"latitude":35.39422953,"accuracy":3,"longitude":140.08740075,"speed":32.25,"altitudeAccuracy":null}}
+{"timestamp":1365310917000,"coords":{"heading":31.399999618530273,"altitude":128.39999389648438,"latitude":35.39449321,"accuracy":3,"longitude":140.08759845,"speed":33.75,"altitudeAccuracy":null}}
+{"timestamp":1365310918000,"coords":{"heading":31.200000762939453,"altitude":128.89999389648438,"latitude":35.39476702,"accuracy":3,"longitude":140.08780159,"speed":35.25,"altitudeAccuracy":null}}
+{"timestamp":1365310919000,"coords":{"heading":31.299999237060547,"altitude":129.10000610351562,"latitude":35.39504722,"accuracy":3,"longitude":140.08801303,"speed":36.25,"altitudeAccuracy":null}}
+{"timestamp":1365310920000,"coords":{"heading":31.399999618530273,"altitude":129.39999389648438,"latitude":35.39533588,"accuracy":3,"longitude":140.08822939,"speed":37.25,"altitudeAccuracy":null}}
+{"timestamp":1365310921000,"coords":{"heading":31.200000762939453,"altitude":129.60000610351562,"latitude":35.39563005,"accuracy":4,"longitude":140.08844586,"speed":38,"altitudeAccuracy":null}}
