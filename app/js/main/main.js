@@ -5,6 +5,6 @@ requirejs.config({
 	}
 });
 
-require(['app'], function(App) {
+require(['main/app'], function(App) {
 	window.redGreen = new App();
 });
