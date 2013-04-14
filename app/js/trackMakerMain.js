@@ -1,5 +1,5 @@
 requirejs.config({
-	baseUrl: 'js',
+	baseUrl: '/js',
 	paths: {
 		'async': 'lib/async-0.1.1',
 		'jquery': '//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min',
