@@ -23,6 +23,6 @@ requirejs.config({
 	}
 });
 
-require(['trackMakerApp', 'config'], function(TrackMakerApp) {
-	window.trackMaker = new TrackMakerApp();
+require(['maps/app', 'config'], function(App) {
+	window.trackMaker = new App();
 });

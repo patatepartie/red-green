@@ -1,4 +1,4 @@
-define(['views/path'], function(PathView) {
+define(['maps/views/path'], function(PathView) {
 	var PathManagerView = Backbone.View.extend({
 		el: '#pathSection',
 		

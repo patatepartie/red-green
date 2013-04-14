@@ -1,4 +1,4 @@
-define(['text!templates/path.html'], function(template) {
+define(['text!maps/templates/path.html'], function(template) {
 	var PathView = Backbone.View.extend({
 		tagName: 'li',
 

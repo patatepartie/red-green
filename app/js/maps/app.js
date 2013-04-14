@@ -1,8 +1,8 @@
 define([
 	'jquery',
-	'views/pathManager',
-	'views/map',
-	'collections/pathList',
+	'maps/views/pathManager',
+	'maps/views/map',
+	'maps/collections/pathList',
 	'server',
 	'config'
 	],

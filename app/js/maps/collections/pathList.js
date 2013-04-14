@@ -1,4 +1,4 @@
-define(['models/path', 'backbone.localstorage'], function(Path) {
+define(['maps/models/path', 'backbone.localstorage'], function(Path) {
 	var PathList = Backbone.Collection.extend({
 		model: Path,
 		localStorage: new Backbone.LocalStorage("paths"),
