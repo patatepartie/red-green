@@ -37,11 +37,13 @@ define([
                     $('#start').hide();
                     $('#stop').show();
                     $('#push').attr("disabled", "disabled");
+                    $('#change').attr("disabled", "disabled");
                 });
                 
                 $('#stop').click(function(event) {
                     $('#start').show();
                     $('#stop').hide();
+                    $('#change').removeAttr("disabled");
                     $('#push').attr("disabled", "disabled");
                     
                     if (self.store.hasCurrentSession()) {
