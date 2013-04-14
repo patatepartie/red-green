@@ -19,5 +19,13 @@ define([], function() {
         
     };
     
+    Store.prototype.currentEventChanged = function () {
+        
+    };
+    
+    Store.prototype.hasPersistedSessions = function () {
+        return true;
+    };
+    
     return Store;
 });
