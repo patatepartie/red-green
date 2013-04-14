@@ -7,6 +7,27 @@
         <script data-main="/js/col/main" src="/js/lib/require.js"></script>
 	</head>
 	<body>
-        
+        <div class="main">
+            <div class="event">
+                <input type="text" id="event"/>
+                <button id="change">Change</button>
+            </div>
+            <div class="sessions">
+                <button id="start">Start</button>
+                <button id="stop">Stop</button>
+                <button id="push">Push</button>
+            </div>
+            <div class="samples">
+                <div id="geo">
+                    <span>Position, updated: </span><span class="update">n/a</span><span>accuracy: </span><span class="accuracy">n/a</span>
+                </div>
+                <div id="accel">
+                    <span>Acceleration, updated: </span><span class="update">n/a</span><span>accuracy: </span><span class="accuracy">n/a</span>
+                </div>
+                <div id="orient">
+                    <span>Orientation, updated: </span><span class="update">n/a</span><span>accuracy: </span><span class="accuracy">n/a</span>
+                </div>
+            </div>
+        </div>
 	</body>
 </html>
