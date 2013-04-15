@@ -1,4 +1,6 @@
-var express = require('express'), 
+var express = require('express'),
+    util = require("util"),
+    strftime = require("strftime"),
 	app = express(),
     port = process.env.PORT || 8880,
     ip = process.env.IP || 'localhost',
@@ -48,18 +50,21 @@ app.get('/tracks', function(req, res) {
 	res.send(tracks);
 });
 
-app.put('/tracks/:session', function(req, res) {
-    var trackName = req.params.trackName;
-    console.log('Add session to track %s', trackName);
+app.post('/sessions', function(req, res) {
+    console.log('Add sessions');
     
-    if (!(trackName in tracks)) {
-        tracks.trackName = {
-            name: trackName,
-            sessions: []
-        };
-    }
+    req.body.sessions.forEach(function (session) {
+        var trackName = util.format("%s-%s", session.track, strftime('%d%m%Y', session.date));
+        if (!(trackName in tracks)) {
+            tracks[trackName] = {
+                name: trackName,
+                sessions: []
+            };
+        }
+        
+        tracks[trackName].sessions.push({id: session.id, samples: session.samples});    
+    });
     
-    tracks[trackName].sessions.push(req.body.session);
         
     res.send('OK');
 });

@@ -149,8 +149,17 @@ define([
                 });
                 
                 $('#push').click(function(event) {
-                    $('#push').attr("disabled", "disabled");     
-                    self.store.emptyPersistedSessions();
+                    $('#error').hide();
+                    $('#push').attr("disabled", "disabled");
+                    $.post('/sessions', {sessions: self.store.getAllSessions()})
+                    .done(function() {                        
+                        self.store.emptyPersistedSessions();    
+                    })
+                    .fail(function(jqXHR, textStatus, errorThrown) {
+                        $('#push').removeAttr("disabled");
+                        $('#error').html(JSON.stringify({textStatus: textStatus, errorThrown: errorThrown}));
+                        $('#error').show();
+                    });
                 });    
             });
 		};

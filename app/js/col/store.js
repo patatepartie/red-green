@@ -37,6 +37,10 @@ define([], function() {
         localStorage.persistedSessions = JSON.stringify(persistedSessions);
     };
     
+    Store.prototype.getAllSessions = function () {
+        return JSON.parse(localStorage.persistedSessions);
+    };
+    
     Store.prototype.emptyPersistedSessions = function () {
         localStorage.persistedSessions = JSON.stringify([]);
     };
