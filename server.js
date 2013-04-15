@@ -2,7 +2,8 @@ var express = require('express'),
 	app = express(),
     port = process.env.PORT || 8880,
     ip = process.env.IP || 'localhost',
-    gpsPaths = [];
+    gpsPaths = [],
+    tracks = {};
 
 app.use(express.static('app'));
 app.use(express.bodyParser());
@@ -36,6 +37,29 @@ app.put('/gps-paths/:pathName', function(req, res) {
 });
 app.delete('/gps-paths/:pathName', function(req, res) {
     console.log('Delete gps path ' + req.params.pathName);
+        
+    res.send('OK');
+});
+
+app.get('/tracks', function(req, res) {
+    console.log('Request all tracks');
+	
+    res.setHeader('Content-Type', 'application/json');	
+	res.send(tracks);
+});
+
+app.put('/tracks/:session', function(req, res) {
+    var trackName = req.params.trackName;
+    console.log('Add session to track %s', trackName);
+    
+    if (!(trackName in tracks)) {
+        tracks.trackName = {
+            name: trackName,
+            sessions: []
+        };
+    }
+    
+    tracks[trackName].sessions.push(req.body.session);
         
     res.send('OK');
 });
