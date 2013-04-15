@@ -14,7 +14,8 @@ define([
                 if (self.store.isNew()) {
                     $('#start').attr("disabled", "disabled");
                 } else {
-                    $('#event').val(self.store.getCurrentEvent());
+                    $('#track').val(self.store.getCurrentTrack());
+                    $('#start').removeAttr("disabled");                    
                 }
                 
                 if (self.store.hasCurrentSession()) {
@@ -23,12 +24,14 @@ define([
                 
                 if (self.store.isEmpty()) {
                     $('#push').attr("disabled", "disabled");
+                } else {
+                    $('#push').removeAttr("disabled");
                 }
                 
                 $('#change').click(function(event) {
-                    var eventName = $('#event').val();
-                    if (eventName) {
-                        self.store.currentEventChanged(eventName);
+                    var trackName = $('#track').val();
+                    if (trackName) {
+                        self.store.currentTrackChanged(trackName);
                         $('#start').removeAttr("disabled");
                     }
                 });
@@ -38,6 +41,8 @@ define([
                     $('#stop').show();
                     $('#push').attr("disabled", "disabled");
                     $('#change').attr("disabled", "disabled");
+                    
+                    self.store.startSession();
                 });
                 
                 $('#stop').click(function(event) {
@@ -56,7 +61,8 @@ define([
                 });
                 
                 $('#push').click(function(event) {
-                    $('#push').attr("disabled", "disabled");                    
+                    $('#push').attr("disabled", "disabled");     
+                    self.store.emptyPersistedSessions();
                 });    
             });
 		};
