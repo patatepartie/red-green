@@ -40,14 +40,10 @@ define([
                 if (self.store.isNew()) {
                     $('#start').attr("disabled", "disabled");
                 } else {
-                    $('#track').val(self.store.getCurrentTrack());
+                    $('#track').val(self.store.getCurrentTrack().name);
                     $('#start').removeAttr("disabled");                    
                 }
-                
-                if (self.store.hasCurrentSession()) {
-                    self.store.persistCurrentSession();
-                }
-                
+                                
                 if (self.store.isEmpty()) {
                     $('#push').attr("disabled", "disabled");
                 } else {
@@ -66,6 +62,14 @@ define([
                     window.addEventListener('devicemotion', function(event) {
                         if (self.watches.acceleration) {
                             $('#accel .update').html(new Date().getTime());
+                            self.sampleCollected({
+                                type: 'acceleration', 
+                                timestamp: new Date().getTime(),
+                                acceleration: event.acceleration,
+                                accelerationIncludingGravity: event.accelerationIncludingGravity,
+                                rotationRate: event.rotationRate,
+                                interval: event.interval                                
+                            });
                         }
                     });
                 }
@@ -74,6 +78,14 @@ define([
                     window.addEventListener('deviceorientation', function(event) {
                         if (self.watches.orientation) {
                             $('#orient .update').html(new Date().getTime());
+                            self.sampleCollected({
+                                type: 'orientation', 
+                                timestamp: new Date().getTime(),
+                                alpha: event.alpha,
+                                beta: event.beta,
+                                gamma: event.gamma,
+                                absolute: event.absolute                                
+                            });
                         }
                     });
                 }
@@ -84,13 +96,19 @@ define([
                     $('#push').attr("disabled", "disabled");
                     $('#change').attr("disabled", "disabled");
                     
-                    self.store.startSession();
+                    self.startSession();
                     
                     if (self.supports.geolocation) {
                         self.watches.position = navigator.geolocation.watchPosition(function(position) {
                             $('#geo').html('<span><b>Position</b> updated: </span><span class="update">n/a</span><span> accuracy: </span><span class="accuracy">n/a</span>');
                             $('#geo .update').html(position.timestamp);
                             $('#geo .accuracy').html(position.coords.accuracy);
+                            
+                            self.sampleCollected({
+                                type: 'acceleration', 
+                                timestamp: position.timestamp,
+                                coordinates: event.coords                               
+                            });
                         }, function(error) {
                             $('#geo').html(JSON.stringify(error));
                         }, {enableHighAccuracy: true});    
@@ -123,9 +141,7 @@ define([
                         self.watches.orientation = false;
                     }
                     
-                    if (self.store.hasCurrentSession()) {
-                        self.store.persistCurrentSession();
-                    }
+                    self.stopSession();
                     
                     if (self.store.hasPersistedSessions()) {
                         $('#push').removeAttr("disabled");
@@ -140,6 +156,24 @@ define([
 		};
 	
 		App.prototype = {
+            startSession: function () {
+                this.store.startSession();
+                var track = this.store.getCurrentTrack();
+                this.currentSession = {
+                    id: track.lastSessionId,
+                    track: track.name,
+                    date: new Date(),
+                    samples: []
+                };
+            },
+            
+            sampleCollected: function(sample) {
+                this.currentSession.samples.push(sample);
+            },
+            
+            stopSession: function () {
+                this.store.persistCurrentSession(this.currentSession);
+            }
 		};
 	
 		return App;

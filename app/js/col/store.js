@@ -14,40 +14,27 @@ define([], function() {
     };
     
     Store.prototype.getCurrentTrack = function () {
-        return JSON.parse(localStorage.currentTrack).name;
+        return JSON.parse(localStorage.currentTrack);
     };
     
     Store.prototype.currentTrackChanged = function (newName) {
         localStorage.currentTrack = JSON.stringify({name: newName, lastSessionId: -1});
     };
     
-    Store.prototype.hasCurrentSession = function () {
-        return localStorage.currentSession;
-    };
-
     Store.prototype.startSession = function () {
         var track = JSON.parse(localStorage.currentTrack);
         track.lastSessionId++;
         localStorage.currentTrack = JSON.stringify(track);
-        
-        localStorage.currentSession = JSON.stringify({
-            id: track.lastSessionId,
-            track: track.name,
-            date: new Date(),
-            samples: []
-        });
     };
         
     Store.prototype.hasPersistedSessions = function () {
         return localStorage.persistedSessions;
     };
     
-    Store.prototype.persistCurrentSession = function () {
-        var session = JSON.parse(localStorage.currentSession);
+    Store.prototype.persistCurrentSession = function (currentSession) {
         var persistedSessions = JSON.parse(localStorage.persistedSessions);
-        persistedSessions.push(session);
+        persistedSessions.push(currentSession);
         localStorage.persistedSessions = JSON.stringify(persistedSessions);
-        localStorage.removeItem('currentSession');        
     };
     
     Store.prototype.emptyPersistedSessions = function () {
