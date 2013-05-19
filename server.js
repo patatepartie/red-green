@@ -5,7 +5,7 @@ var express = require('express'),
     port = process.env.PORT || 8880,
     ip = process.env.IP || 'localhost',
     gpsPaths = [],
-    tracks = {};
+    tracks = require('./routes/tracks');
 
 app.use(express.static('app'));
 app.use(express.bodyParser());
@@ -43,12 +43,10 @@ app.delete('/gps-paths/:pathName', function(req, res) {
     res.send('OK');
 });
 
-app.get('/tracks', function(req, res) {
-    console.log('Request all tracks');
-	
-    res.setHeader('Content-Type', 'application/json');	
-	res.send(tracks);
-});
+
+app.get('/tracks', tracks.findAll);
+app.post('/tracks', tracks.addTrack);
+app.get('/tracks/:key', tracks.findByKey);
 
 app.post('/sessions', function(req, res) {
     console.log('Add sessions');
@@ -71,7 +69,7 @@ app.post('/sessions', function(req, res) {
 
 app.use(function(err, req, res, next) {
 	console.error(err.stack);
-	res.send(500, 'Something broke!');
+	res.send(500, 'Something broke! ' + JSON.stringify(err));
 });
 
 app.listen(port, ip);
