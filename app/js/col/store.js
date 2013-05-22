@@ -2,11 +2,8 @@ define([], function() {
     var Store = function() {
         if(!localStorage.persistedSessions) {
             localStorage.persistedSessions = JSON.stringify([]);
+            localStorage.currentTrack = "-1";
         }
-    };
-    
-    Store.prototype.isNew = function () {
-        return !localStorage.currentTrack;
     };
     
     Store.prototype.isEmpty = function () {
@@ -14,19 +11,13 @@ define([], function() {
     };
     
     Store.prototype.getCurrentTrack = function () {
-        return JSON.parse(localStorage.currentTrack);
+        return localStorage.currentTrack;
     };
     
     Store.prototype.currentTrackChanged = function (newName) {
-        localStorage.currentTrack = JSON.stringify({name: newName, lastSessionId: -1});
+        localStorage.currentTrack = newName;
     };
     
-    Store.prototype.startSession = function () {
-        var track = JSON.parse(localStorage.currentTrack);
-        track.lastSessionId++;
-        localStorage.currentTrack = JSON.stringify(track);
-    };
-        
     Store.prototype.hasPersistedSessions = function () {
         return localStorage.persistedSessions;
     };
@@ -37,12 +28,17 @@ define([], function() {
         localStorage.persistedSessions = JSON.stringify(persistedSessions);
     };
     
-    Store.prototype.getAllSessions = function () {
-        return JSON.parse(localStorage.persistedSessions);
+    Store.prototype.eachSession = function (iter) {
+        var persistedSessions = JSON.parse(localStorage.persistedSessions);
+        persistedSessions.forEach(iter);
     };
     
-    Store.prototype.emptyPersistedSessions = function () {
-        localStorage.persistedSessions = JSON.stringify([]);
+    Store.prototype.removeSession = function (sessionToRemove) {
+        var persistedSessions = JSON.parse(localStorage.persistedSessions);
+        var newSessions = persistedSessions.filter(function(session) {
+            return !(session.key === sessionToRemove.key && session.track === sessionToRemove.track);
+        });
+        localStorage.persistedSessions = JSON.stringify(newSessions);
     };
     
     return Store;

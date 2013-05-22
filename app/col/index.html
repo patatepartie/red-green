@@ -4,14 +4,15 @@
 		<meta charset="utf-8">
 		<title>Red Green - Data Collector</title>
         
+        <link rel="stylesheet" href="/css/col.css" />
         <script data-main="/js/col/main" src="/js/lib/require.js"></script>
 	</head>
 	<body>
         <div class="main">
-            <div class="track">
-                <input type="text" id="track"/>
-                <button id="change">Change</button>
-            </div>
+            <select id="tracks" size="1">
+                <option value="-1">Select one</option>    
+            </select>
+            
             <div class="sessions">
                 <button id="start" disabled>Start</button>
                 <button id="stop" style="display: none;">Stop</button>

@@ -1,12 +1,17 @@
 define([
     'jquery',
-    'col/store'
+    'col/store',
+    'col/server',
+    'moment'
 	],
 	
-	function($, Store) {
+	function($, Store, Server, moment) {
 		var App = function() {
 			var self = this;
+            
             self.store = new Store();
+            self.server = new Server();
+            
             self.supports = {
                 geolocation: true,
                 acceleration: true,
@@ -16,7 +21,7 @@ define([
                         
             $(function() {
                 if (!navigator) {
-                    $('#main').html("This navigator doesn't support sensors");
+                    $('#error').html("This navigator doesn't support sensors");
                 } else {
                     if (!navigator.geolocation) {
                         $('#geo').html("No geolocalisation support");
@@ -35,28 +40,42 @@ define([
                     }
                 }
                 
+                $('#start').attr("disabled", "disabled");
+                $('#tracks').attr("disabled", "disabled");
                 $('#stop').hide();
             
-                if (self.store.isNew()) {
-                    $('#start').attr("disabled", "disabled");
-                } else {
-                    $('#track').val(self.store.getCurrentTrack().name);
-                    $('#start').removeAttr("disabled");                    
-                }
+                self.server.fetch()
+                .done(function(tracks) {
+                    tracks.forEach(function(track) {
+                        $("#tracks").append('<option value="' + track.key + '">' + track.name + '</option>');
+                    });
+                    
+                    $('#tracks').removeAttr("disabled");
+                    $('#tracks option[value="' + self.store.getCurrentTrack() + '"]').attr('selected', true);
+                    $('#tracks').val(self.store.getCurrentTrack()).change();
+                })
+                .fail(function() {
+                    $('#error').html("Cannot fetch tracks from the server");
+                    
+                    $('#tracks').attr("disabled", "disabled");
+                });
+                
+                $('#tracks').change(function() {
+                    console.log("selection changed");
+                    var trackKey = $('#tracks option:selected').val();
+                    if (trackKey === "-1") {
+                        $('#start').attr("disabled", "disabled");
+                    } else {
+                        self.store.currentTrackChanged(trackKey);
+                        $('#start').removeAttr("disabled");
+                    }
+                });
                                 
                 if (self.store.isEmpty()) {
                     $('#push').attr("disabled", "disabled");
                 } else {
                     $('#push').removeAttr("disabled");
                 }
-                
-                $('#change').click(function(event) {
-                    var trackName = $('#track').val();
-                    if (trackName) {
-                        self.store.currentTrackChanged(trackName);
-                        $('#start').removeAttr("disabled");
-                    }
-                });
                 
                 if (self.supports.acceleration) {
                     window.addEventListener('devicemotion', function(event) {
@@ -94,7 +113,7 @@ define([
                     $('#start').hide();
                     $('#stop').show();
                     $('#push').attr("disabled", "disabled");
-                    $('#change').attr("disabled", "disabled");
+                    $('#tracks').attr("disabled", "disabled");
                     
                     self.startSession();
                     
@@ -126,7 +145,7 @@ define([
                 $('#stop').click(function(event) {
                     $('#start').show();
                     $('#stop').hide();
-                    $('#change').removeAttr("disabled");
+                    $('#tracks').removeAttr("disabled");
                     $('#push').attr("disabled", "disabled");
                     
                     if (self.watches.position) {
@@ -151,10 +170,8 @@ define([
                 $('#push').click(function(event) {
                     $('#error').hide();
                     $('#push').attr("disabled", "disabled");
-                    $.post('/sessions', {sessions: self.store.getAllSessions()})
-                    .done(function() {                        
-                        self.store.emptyPersistedSessions();    
-                    })
+                    
+                    self.server.push(self.store)
                     .fail(function(jqXHR, textStatus, errorThrown) {
                         $('#push').removeAttr("disabled");
                         $('#error').html(JSON.stringify({textStatus: textStatus, errorThrown: errorThrown}));
@@ -166,12 +183,9 @@ define([
 	
 		App.prototype = {
             startSession: function () {
-                this.store.startSession();
-                var track = this.store.getCurrentTrack();
                 this.currentSession = {
-                    id: track.lastSessionId,
-                    track: track.name,
-                    date: new Date(),
+                    date: moment().format("DDMMYYYYHHmm"),
+                    track: this.store.getCurrentTrack(),                    
                     samples: []
                 };
             },

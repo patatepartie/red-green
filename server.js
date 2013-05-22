@@ -47,6 +47,9 @@ app.delete('/gps-paths/:pathName', function(req, res) {
 app.get('/tracks', tracks.findAll);
 app.post('/tracks', tracks.addTrack);
 app.get('/tracks/:key', tracks.findByKey);
+app.post('/tracks/:key/sessions', tracks.addSession);
+app.get('/tracks/:key/sessions', tracks.findAllSessionsForTrack);
+app.get('/tracks/:key/sessions/:when', tracks.findSessionForTrackByDate);
 
 app.post('/sessions', function(req, res) {
     console.log('Add sessions');
